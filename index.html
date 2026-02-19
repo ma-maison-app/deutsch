@@ -4,33 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Deutsch — My Study Space</title>
-<!--
-  ═══════════════════════════════════════════════════════════════
-  DEUTSCH STUDY APP - FIXED VERSION
-  ═══════════════════════════════════════════════════════════════
-  
-  WHAT WAS FIXED:
-  ✓ Added proper error handling for network failures
-  ✓ Better error messages when Supabase connection fails
-  ✓ Graceful degradation when offline
-  
-  REQUIREMENTS TO USE THIS APP:
-  1. Internet connection (required for Supabase backend)
-  2. Modern web browser (Chrome, Firefox, Safari, Edge)
-  3. Must be served from a web server (not just opened as file://)
-  
-  TO RUN LOCALLY:
-  - Use a local server like: python -m http.server 8000
-  - Or use VS Code Live Server extension
-  - Then open http://localhost:8000
-  
-  THE "FAILED TO FETCH" ERROR MEANS:
-  - No internet connection, OR
-  - File opened directly (file://) instead of through a server, OR  
-  - Network firewall blocking Supabase
-  
-  ═══════════════════════════════════════════════════════════════
--->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Work+Sans:wght@300;400;500;600&family=Allura&display=swap" rel="stylesheet">
 <style>
@@ -1628,66 +1601,142 @@ main {
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ══════════════════════════════════════════════════════════
-// SUPABASE
+// SUPABASE - USING WORKING CONFIGURATION
 // ══════════════════════════════════════════════════════════
-const { createClient } = supabase;
 const SB = {
-  client: null,
-  init() {
-    this.client = createClient(
-      'https://jojxmhhrdzvwxkdcgqub.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvanhta' +
-      'mhyZHp2d3hrZGNncXViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0OTQ4NzYsImV4cCI6MjA1MTA3MDg3Nn0.s' +
-      'JMIjNL6u3Xj-eKGPxCYVwaCujJN4jGGvHQ_LOAVWnI'
-    );
+  url: 'https://cjjutbqvkcqqzxduqipe.supabase.co',
+  key: 'sb_publishable_jgqgGhV9DyWJ3sTJVUISwg_8yUR1Lt6',
+  user: null,
+
+  headers(extra={}) {
+    const h = { 'Content-Type':'application/json', 'apikey': this.key, ...extra };
+    if (this.user?.token) h['Authorization'] = `Bearer ${this.user.token}`;
+    return h;
   },
+
+  async signUp(email, password) {
+    const r = await fetch(`${this.url}/auth/v1/signup`, {
+      method:'POST', headers: this.headers(),
+      body: JSON.stringify({ email, password })
+    });
+    const d = await r.json();
+    if (d.error || d.msg) throw new Error(d.error_description || d.msg || d.error);
+    if (!d.access_token) throw new Error('Check your email to confirm your account, then sign in.');
+    this.user = { uid:d.user.id, email:d.user.email, token:d.access_token, refresh:d.refresh_token };
+    await this._persist();
+    return this.user;
+  },
+
+  async signIn(email, password) {
+    const r = await fetch(`${this.url}/auth/v1/token?grant_type=password`, {
+      method:'POST', headers: this.headers(),
+      body: JSON.stringify({ email, password })
+    });
+    const d = await r.json();
+    if (d.error || d.error_description) throw new Error(d.error_description || d.error);
+    this.user = { uid:d.user.id, email:d.user.email, token:d.access_token, refresh:d.refresh_token };
+    await this._persist();
+    return this.user;
+  },
+
+  async signOut() {
+    try {
+      await fetch(`${this.url}/auth/v1/logout`, { method:'POST', headers: this.headers() });
+    } catch(e){}
+    this.user = null;
+    try { localStorage.removeItem('sb_user'); } catch(e){}
+  },
+
+  async refreshToken() {
+    if (!this.user?.refresh) return;
+    try {
+      const r = await fetch(`${this.url}/auth/v1/token?grant_type=refresh_token`, {
+        method:'POST', headers: this.headers(),
+        body: JSON.stringify({ refresh_token: this.user.refresh })
+      });
+      const d = await r.json();
+      if (d.access_token) {
+        this.user.token = d.access_token;
+        this.user.refresh = d.refresh_token;
+        await this._persist();
+      }
+    } catch(e){}
+  },
+
+  async saveData(vocab, notes, resources) {
+    const body = { 
+      user_id: this.user.uid, 
+      vocab: JSON.stringify(vocab), 
+      notes: JSON.stringify(notes),
+      resources: JSON.stringify(resources)
+    };
+    const r = await fetch(`${this.url}/rest/v1/deutsch_data?on_conflict=user_id`, {
+      method:'POST',
+      headers: this.headers({ 'Prefer':'return=minimal,resolution=merge-duplicates' }),
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) {
+      let msg = r.statusText;
+      try { const e=await r.json(); msg=e.message||e.hint||JSON.stringify(e); } catch(ex){}
+      throw new Error(msg);
+    }
+    return true;
+  },
+
+  async loadData() {
+    const r = await fetch(`${this.url}/rest/v1/deutsch_data?user_id=eq.${this.user.uid}&select=*`, {
+      headers: this.headers()
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message||JSON.stringify(d));
+    if (!d || !d.length) return { vocab:[], notes:[], resources:[] };
+    return {
+      vocab: JSON.parse(d[0].vocab || '[]'),
+      notes: JSON.parse(d[0].notes || '[]'),
+      resources: JSON.parse(d[0].resources || '[]')
+    };
+  },
+
+  _dbName:'DeutschDB', _store:'auth',
+  async _getDB() {
+    return new Promise((res,rej)=>{
+      const req = indexedDB.open(this._dbName,1);
+      req.onerror = ()=>rej(req.error);
+      req.onsuccess = ()=>res(req.result);
+      req.onupgradeneeded = e=>{ const db=e.target.result; if(!db.objectStoreNames.contains(this._store)) db.createObjectStore(this._store); };
+    });
+  },
+
+  async _persist() {
+    try {
+      const db = await this._getDB();
+      const tx = db.transaction(this._store,'readwrite');
+      tx.objectStore(this._store).put(this.user,'user');
+      await new Promise((res,rej)=>{ tx.oncomplete=res; tx.onerror=()=>rej(tx.error); });
+    } catch(e){ console.warn('Could not persist session',e); }
+  },
+
   async restoreSession() {
     try {
-      const { data } = await this.client.auth.getSession();
-      return data?.session?.user || null;
-    } catch (error) {
-      console.error('Session restore failed:', error);
-      return null;
-    }
-  },
-  async signUp(email, password) {
-    const { data, error } = await this.client.auth.signUp({ email, password });
-    if (error) throw error;
-    return data.user;
-  },
-  async signIn(email, password) {
-    const { data, error } = await this.client.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return data.user;
-  },
-  async signOut() {
-    await this.client.auth.signOut();
-  },
-  async loadData() {
-    try {
-      const { data, error } = await this.client.from('deutsch_data').select('*').single();
-      if (error) throw error;
-      return data || {};
-    } catch (error) {
-      console.error('Load data failed:', error);
-      toast('Failed to load data from server', 'err');
-      return {};
-    }
-  },
-  async saveData(payload) {
-    try {
-      const { error } = await this.client.from('deutsch_data').upsert(payload);
-      if (error) throw error;
-    } catch (error) {
-      console.error('Save data failed:', error);
-      toast('Failed to save data to server', 'err');
-    }
+      const db = await this._getDB();
+      const tx = db.transaction(this._store);
+      const u = await new Promise((res,rej)=>{
+        const req = tx.objectStore(this._store).get('user');
+        req.onsuccess = ()=>res(req.result);
+        req.onerror = ()=>rej(req.error);
+      });
+      if (u && u.token) {
+        this.user = u;
+        await this.refreshToken();
+        return this.user;
+      }
+    } catch(e){ console.warn('Could not restore session',e); }
+    return null;
   }
 };
-SB.init();
+
 
 // ══════════════════════════════════════════════════════════
 // STATE
@@ -1702,6 +1751,19 @@ function esc(str) {
   const div = document.createElement('div'); 
   div.textContent = str; 
   return div.innerHTML; 
+}
+
+function updateSyncStatus(status) {
+  const el = g('sync-status');
+  if (!el) return;
+  el.classList.remove('err');
+  if (status === 'synced') el.textContent = 'synced';
+  else if (status === 'saving') el.textContent = 'saving...';
+  else if (status === 'syncing') el.textContent = 'loading...';
+  else if (status === 'err') {
+    el.textContent = 'error';
+    el.classList.add('err');
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1722,10 +1784,7 @@ async function signUp(e) {
     g('su-err').textContent = 'Check your email to confirm!';
     setTimeout(() => switchAuthTab('signin'), 2000);
   } catch (err) {
-    const errorMsg = err.message.includes('fetch') 
-      ? 'Network error - please check your internet connection'
-      : err.message;
-    g('su-err').textContent = errorMsg;
+    g('su-err').textContent = err.message;
   }
 }
 
@@ -1736,10 +1795,7 @@ async function signIn(e) {
     const user = await SB.signIn(email, pass);
     await bootApp();
   } catch (err) {
-    const errorMsg = err.message.includes('fetch') 
-      ? 'Network error - please check your internet connection'
-      : err.message;
-    g('si-err').textContent = errorMsg;
+    g('si-err').textContent = err.message;
   }
 }
 
@@ -1755,17 +1811,25 @@ async function bootApp() {
   g('user-email').textContent = user.email;
   g('auth-screen').style.display = 'none';
   g('app').style.display = 'block';
+  updateSyncStatus('syncing');
   
-  const data = await SB.loadData();
-  vocab = data.vocab || [];
-  notes = data.notes || [];
-  resources = data.resources || [];
-  
-  updateTopicDrop();
-  updateQuizTopicDrop();
-  renderVocab();
-  renderNotes();
-  renderResources();
+  try {
+    const data = await SB.loadData();
+    vocab = data.vocab || [];
+    notes = data.notes || [];
+    resources = data.resources || [];
+    
+    updateTopicDrop();
+    updateQuizTopicDrop();
+    renderVocab();
+    renderNotes();
+    renderResources();
+    updateSyncStatus('synced');
+  } catch (err) {
+    console.error('Load error:', err);
+    updateSyncStatus('err');
+    toast('Could not load data: ' + err.message, 'err');
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1773,17 +1837,15 @@ async function bootApp() {
 // ══════════════════════════════════════════════════════════
 function scheduleSave() {
   clearTimeout(saveTimer);
-  g('sync-status').textContent = 'saving...';
-  g('sync-status').classList.remove('err');
+  updateSyncStatus('saving');
   saveTimer = setTimeout(async () => {
     try {
-      const userId = (await SB.restoreSession())?.id;
-      if (!userId) throw new Error('Not authenticated');
-      await SB.saveData({ id: userId, vocab, notes, resources });
-      g('sync-status').textContent = 'synced';
+      await SB.saveData(vocab, notes, resources);
+      updateSyncStatus('synced');
     } catch (err) {
-      g('sync-status').textContent = 'error';
-      g('sync-status').classList.add('err');
+      console.error('Save error:', err);
+      updateSyncStatus('err');
+      toast('Could not save: ' + err.message, 'err');
     }
   }, 1000);
 }
@@ -2460,25 +2522,9 @@ function resetQuiz() {
 // INIT
 // ══════════════════════════════════════════════════════════
 (async () => {
-  try {
-    const user = await SB.restoreSession();
-    if (user) {
-      await bootApp();
-    }
-  } catch (error) {
-    console.error('Initialization error:', error);
-    // Show auth screen even on error so user can try to login
-    g('auth-screen').style.display = 'flex';
-    g('app-screen').style.display = 'none';
-    
-    // If it's a network error, show helpful message
-    if (error.message && error.message.includes('fetch')) {
-      const authNote = document.querySelector('.auth-note');
-      if (authNote) {
-        authNote.textContent = '⚠️ Network connection issue. Please check your internet connection and try again.';
-        authNote.style.color = 'var(--error)';
-      }
-    }
+  const user = await SB.restoreSession();
+  if (user) {
+    await bootApp();
   }
 })();
 </script>
