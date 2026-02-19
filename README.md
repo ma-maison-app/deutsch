@@ -178,12 +178,65 @@ main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem 6rem; }
 .toast.ok { background:var(--n); }
 .toast.err { background:var(--f); }
 
+/* ── DICT LINKS ── */
+.dict-bar { display:flex; flex-wrap:wrap; gap:.45rem; margin-bottom:2rem; padding:.9rem 1.1rem; background:rgba(255,255,255,.5); border:1px solid var(--border); border-radius:var(--radius); align-items:center; }
+.dict-label { font-size:.56rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-right:.3rem; flex-shrink:0; }
+.dict-link { font-size:.67rem; font-weight:400; letter-spacing:.08em; padding:.26rem .7rem; border:1px solid var(--border); border-radius:20px; color:var(--muted); text-decoration:none; transition:all .18s; background:transparent; white-space:nowrap; }
+.dict-link:hover { color:var(--gold); border-color:var(--gold); background:rgba(184,145,63,.05); }
+.dict-link .di { font-size:.55rem; opacity:.6; margin-left:.25rem; }
+
+/* ── LOOKUP LINK ON CARDS ── */
+.vc-lookup { display:inline-flex; gap:.25rem; margin-top:.35rem; flex-wrap:wrap; }
+.vc-lookup a { font-size:.56rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); text-decoration:none; border-bottom:1px dotted rgba(184,145,63,.35); transition:color .15s; }
+.vc-lookup a:hover { color:var(--gold); }
+
+/* ── HEATMAP ── */
+.heatmap-section { margin-bottom:2.5rem; }
+.heatmap-title { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-style:italic; color:var(--ink); margin-bottom:.5rem; }
+.heatmap-subtitle { font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:1.2rem; }
+.heatmap-wrap { background:rgba(255,255,255,.5); border:1px solid var(--border); border-radius:var(--radius); padding:1.4rem 1.6rem 1.2rem; overflow-x:auto; }
+.heatmap-months { display:flex; gap:0; margin-bottom:.35rem; padding-left:28px; }
+.hm-month-label { font-size:.57rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); flex:0 0 auto; }
+.heatmap-grid { display:flex; gap:3px; }
+.hm-day-labels { display:flex; flex-direction:column; gap:3px; margin-right:5px; }
+.hm-day-label { font-size:.52rem; color:var(--muted); height:12px; line-height:12px; width:22px; text-align:right; }
+.hm-weeks { display:flex; gap:3px; }
+.hm-week { display:flex; flex-direction:column; gap:3px; }
+.hm-day { width:12px; height:12px; border-radius:2px; background:rgba(184,145,63,.08); border:1px solid rgba(184,145,63,.1); cursor:default; transition:transform .1s; flex-shrink:0; }
+.hm-day:hover { transform:scale(1.3); z-index:1; }
+.hm-day.l1 { background:rgba(184,145,63,.25); border-color:rgba(184,145,63,.3); }
+.hm-day.l2 { background:rgba(184,145,63,.5); border-color:rgba(184,145,63,.5); }
+.hm-day.l3 { background:rgba(184,145,63,.75); border-color:rgba(184,145,63,.7); }
+.hm-day.l4 { background:var(--gold); border-color:var(--gold-light); }
+.hm-day.future { background:transparent; border-color:transparent; }
+.heatmap-legend { display:flex; align-items:center; gap:.4rem; margin-top:.9rem; justify-content:flex-end; }
+.hm-leg-label { font-size:.56rem; letter-spacing:.08em; color:var(--muted); }
+.hm-leg-swatch { width:11px; height:11px; border-radius:2px; border:1px solid rgba(184,145,63,.2); }
+.heatmap-tooltip { position:fixed; background:var(--ink); color:var(--paper); font-size:.65rem; padding:.3rem .6rem; border-radius:2px; pointer-events:none; z-index:300; display:none; letter-spacing:.04em; }
+
+/* ── MONTHLY BARS ── */
+.monthly-bars { display:grid; grid-template-columns:repeat(auto-fill,minmax(60px,1fr)); gap:.6rem; margin-top:1rem; }
+.mbar-item { display:flex; flex-direction:column; align-items:center; gap:.3rem; }
+.mbar-track { width:100%; height:60px; background:rgba(184,145,63,.07); border-radius:2px; display:flex; align-items:flex-end; border:1px solid var(--border); overflow:hidden; }
+.mbar-fill { width:100%; background:linear-gradient(180deg,var(--gold-light),var(--gold)); border-radius:2px 2px 0 0; transition:height .4s ease; }
+.mbar-label { font-size:.56rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.mbar-count { font-family:'Cormorant Garamond',serif; font-size:.9rem; color:var(--gold); }
+
+/* ── PROGRESS STATS ── */
+.prog-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.75rem; margin-bottom:2rem; }
+.prog-card { background:rgba(255,255,255,.55); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.2rem; text-align:center; }
+.prog-num { font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--gold); line-height:1; }
+.prog-desc { font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:.25rem; }
+.prog-sub { font-size:.7rem; font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--muted); margin-top:.15rem; }
+.streak-flame { font-size:1.1rem; }
+
 @media(max-width:600px){
   .word-hero{grid-template-columns:1fr}
   .wh-cell{border-right:none;border-bottom:1px solid var(--border)}
   .wh-cell:last-child{border-bottom:none}
   .vocab-grid{grid-template-columns:1fr}
   .user-bar{position:static;justify-content:center;padding:.5rem 0 0}
+  .heatmap-wrap{padding:.9rem .7rem}
 }
 </style>
 </head>
@@ -233,6 +286,7 @@ main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem 6rem; }
   <nav>
     <button class="tab-btn active" onclick="switchTab('vocab',this)">Vocabulary</button>
     <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Resources</button>
+    <button class="tab-btn" onclick="switchTab('progress',this);renderProgress()">Progress</button>
   </nav>
 
   <main>
@@ -240,12 +294,23 @@ main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem 6rem; }
     <!-- VOCAB -->
     <div id="panel-vocab" class="panel active">
 
+      <div class="dict-bar">
+        <span class="dict-label">Dictionaries</span>
+        <a class="dict-link" href="https://www.dict.cc" target="_blank" rel="noopener">dict.cc <span class="di">↗</span></a>
+        <a class="dict-link" href="https://www.linguee.com/german-english" target="_blank" rel="noopener">Linguee <span class="di">↗</span></a>
+        <a class="dict-link" href="https://www.pons.com/translate/german-english" target="_blank" rel="noopener">PONS <span class="di">↗</span></a>
+        <a class="dict-link" href="https://www.duden.de/suchen/dudenonline" target="_blank" rel="noopener">Duden <span class="di">↗</span></a>
+        <a class="dict-link" href="https://www.deepl.com/translator#de/en/" target="_blank" rel="noopener">DeepL <span class="di">↗</span></a>
+        <a class="dict-link" href="https://context.reverso.net/translation/german-english" target="_blank" rel="noopener">Reverso Context <span class="di">↗</span></a>
+        <a class="dict-link" href="https://de.wiktionary.org" target="_blank" rel="noopener">Wiktionary DE <span class="di">↗</span></a>
+      </div>
+
       <div id="stats-row" class="stats-row"></div>
 
-      <div class="add-card open" id="add-card">
+      <div class="add-card" id="add-card">
         <div class="add-card-header" onclick="toggleCard('add-card','add-hint','add word')">
           <div class="add-card-title"><span class="add-icon">+</span>Add a new word</div>
-          <span class="add-card-hint" id="add-hint">collapse</span>
+          <span class="add-card-hint" id="add-hint">add word</span>
         </div>
         <div class="add-card-body">
           <div class="word-hero">
@@ -319,10 +384,19 @@ main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem 6rem; }
     <!-- NOTES -->
     <div id="panel-notes" class="panel">
 
-      <div class="add-card open" id="note-card">
+      <div class="dict-bar">
+        <span class="dict-label">Grammar help</span>
+        <a class="dict-link" href="https://www.germanveryeasy.com" target="_blank" rel="noopener">German Very Easy <span class="di">↗</span></a>
+        <a class="dict-link" href="https://www.dartmouth.edu/~deutsch/Grammatik/Grammatik.html" target="_blank" rel="noopener">Dartmouth Grammar <span class="di">↗</span></a>
+        <a class="dict-link" href="https://www.germanpod101.com" target="_blank" rel="noopener">GermanPod101 <span class="di">↗</span></a>
+        <a class="dict-link" href="https://www.youtube.com/@EasyGerman" target="_blank" rel="noopener">Easy German YT <span class="di">↗</span></a>
+        <a class="dict-link" href="https://ankiweb.net/decks" target="_blank" rel="noopener">Anki Decks <span class="di">↗</span></a>
+      </div>
+
+      <div class="add-card" id="note-card">
         <div class="add-card-header" onclick="toggleCard('note-card','note-hint','add note')">
           <div class="add-card-title"><span class="add-icon">+</span>Add a note or resource</div>
-          <span class="add-card-hint" id="note-hint">collapse</span>
+          <span class="add-card-hint" id="note-hint">add note</span>
         </div>
         <div class="add-card-body">
           <div class="dg">
@@ -360,6 +434,42 @@ main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem 6rem; }
       <div class="notes-grid" id="notes-grid"></div>
     </div>
 
+    <!-- PROGRESS -->
+    <div id="panel-progress" class="panel">
+      <div class="prog-cards" id="prog-cards"></div>
+      <div class="heatmap-section">
+        <div class="heatmap-title">Word additions — past year</div>
+        <div class="heatmap-subtitle">Each square is one day</div>
+        <div class="heatmap-wrap">
+          <div class="heatmap-months" id="hm-month-labels"></div>
+          <div class="heatmap-grid">
+            <div class="hm-day-labels">
+              <div class="hm-day-label" style="margin-top:0">Mon</div>
+              <div class="hm-day-label" style="margin-top:12px">Wed</div>
+              <div class="hm-day-label" style="margin-top:12px">Fri</div>
+            </div>
+            <div class="hm-weeks" id="hm-weeks"></div>
+          </div>
+          <div class="heatmap-legend">
+            <span class="hm-leg-label">Less</span>
+            <div class="hm-leg-swatch" style="background:rgba(184,145,63,.08)"></div>
+            <div class="hm-leg-swatch" style="background:rgba(184,145,63,.25)"></div>
+            <div class="hm-leg-swatch" style="background:rgba(184,145,63,.5)"></div>
+            <div class="hm-leg-swatch" style="background:rgba(184,145,63,.75)"></div>
+            <div class="hm-leg-swatch" style="background:var(--gold)"></div>
+            <span class="hm-leg-label">More</span>
+          </div>
+        </div>
+      </div>
+      <div class="heatmap-section">
+        <div class="heatmap-title">Words per month</div>
+        <div class="heatmap-subtitle">How many new words you added each month</div>
+        <div class="heatmap-wrap">
+          <div class="monthly-bars" id="monthly-bars"></div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -393,6 +503,7 @@ main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem 6rem; }
   </div>
 </div>
 
+<div class="heatmap-tooltip" id="hm-tooltip"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -718,6 +829,11 @@ function renderVocab(){
         ${v.cases?`<span class="vc-el">Cases / Conj.</span>${esc(v.cases)}`:''}
         ${v.context?`<span class="vc-el">Context</span><div class="vc-ctx">${esc(v.context)}</div>`:''}
       </div>`:''}
+      <div class="vc-lookup">
+        <a href="https://www.dict.cc/?s=${encodeURIComponent(v.word)}" target="_blank" rel="noopener">dict.cc</a>
+        <a href="https://www.linguee.com/german-english/search?query=${encodeURIComponent(v.word)}" target="_blank" rel="noopener">Linguee</a>
+        <a href="https://www.duden.de/suchen/dudenonline/${encodeURIComponent(v.word)}" target="_blank" rel="noopener">Duden</a>
+      </div>
       <div class="card-actions">
         <button class="btn sec sm" onclick="openEdit(${v.id})">Edit</button>
         <button class="btn sm danger" onclick="deleteWord(${v.id})">Delete</button>
@@ -799,8 +915,115 @@ function renderNotes(){
 }
 
 // ══════════════════════════════════════════════════════════
-// INIT — try to restore session
+// PROGRESS & HEATMAP
 // ══════════════════════════════════════════════════════════
+function renderProgress() {
+  // ── Stats cards ──
+  const total = vocab.length;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toDateString();
+  const todayCount = vocab.filter(v=>new Date(v.added).toDateString()===todayStr).length;
+
+  // streak
+  let streak=0, d=new Date(today);
+  while(true){
+    const ds=d.toDateString();
+    if(vocab.some(v=>new Date(v.added).toDateString()===ds)){streak++;d.setDate(d.getDate()-1);}
+    else break;
+  }
+
+  // best day
+  const dayMap={};
+  vocab.forEach(v=>{const k=new Date(v.added).toDateString();dayMap[k]=(dayMap[k]||0)+1;});
+  const bestDay=Object.values(dayMap).length?Math.max(...Object.values(dayMap)):0;
+
+  // this week
+  const weekStart=new Date(today); weekStart.setDate(today.getDate()-today.getDay());
+  const thisWeek=vocab.filter(v=>new Date(v.added)>=weekStart).length;
+
+  g('prog-cards').innerHTML=`
+    <div class="prog-card"><div class="prog-num">${total}</div><div class="prog-desc">Total words</div></div>
+    <div class="prog-card"><div class="prog-num">${todayCount}</div><div class="prog-desc">Added today</div></div>
+    <div class="prog-card"><div class="prog-num"><span class="streak-flame">🔥</span>${streak}</div><div class="prog-desc">Day streak</div><div class="prog-sub">consecutive days</div></div>
+    <div class="prog-card"><div class="prog-num">${thisWeek}</div><div class="prog-desc">This week</div></div>
+    <div class="prog-card"><div class="prog-num">${bestDay}</div><div class="prog-desc">Best day</div><div class="prog-sub">words in one day</div></div>
+  `;
+
+  // ── Heatmap ──
+  // Start from Monday 52 weeks ago
+  const end = new Date(today);
+  // go to next Saturday so we complete the week
+  const endDay = end.getDay(); // 0=Sun
+  end.setDate(end.getDate() + (6-endDay));
+  const start = new Date(end);
+  start.setDate(end.getDate() - 52*7 + 1);
+  // align to Monday
+  while(start.getDay()!==1) start.setDate(start.getDate()-1);
+
+  // Build month labels
+  const weeksEl=g('hm-weeks'); weeksEl.innerHTML='';
+  const monthLabelsEl=g('hm-month-labels'); monthLabelsEl.innerHTML='';
+
+  let cur=new Date(start), weeks=[], weekDays=[], prevMonth=-1, monthWidths=[];
+  let curMonthWeeks=0;
+  while(cur<=end){
+    if(weekDays.length===7){ weeks.push(weekDays); weekDays=[]; curMonthWeeks++; }
+    const isToday=cur.toDateString()===todayStr;
+    const isFuture=cur>today;
+    const count=dayMap[cur.toDateString()]||0;
+    let lvl='';
+    if(!isFuture&&count>0){lvl=count>=5?'l4':count>=3?'l3':count>=2?'l2':'l1';}
+    const dateStr=cur.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const label=count>0?`${count} word${count!==1?'s':''} · ${dateStr}`:dateStr;
+    weekDays.push({lvl,future:isFuture,today:isToday,label});
+
+    // month label
+    const m=cur.getMonth();
+    if(m!==prevMonth){
+      if(prevMonth!==-1) monthWidths.push({month:new Date(cur.getFullYear(),prevMonth,1).toLocaleString('default',{month:'short'}),weeks:curMonthWeeks});
+      curMonthWeeks=0; prevMonth=m;
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  if(weekDays.length) weeks.push(weekDays);
+  monthWidths.push({month:new Date(today.getFullYear(),prevMonth,1).toLocaleString('default',{month:'short'}),weeks:curMonthWeeks+1});
+
+  // Render month labels
+  monthLabelsEl.innerHTML=monthWidths.map(mw=>`<div class="hm-month-label" style="width:${mw.weeks*15}px">${mw.month}</div>`).join('');
+
+  // Render weeks
+  const tip=g('hm-tooltip');
+  weeksEl.innerHTML=weeks.map(wk=>`<div class="hm-week">${wk.map(day=>`<div class="hm-day${day.lvl?' '+day.lvl:''}${day.future?' future':''}${day.today?' today':''}" data-tip="${day.label}"></div>`).join('')}</div>`).join('');
+
+  // Tooltip events
+  weeksEl.querySelectorAll('.hm-day:not(.future)').forEach(el=>{
+    el.addEventListener('mouseenter',e=>{
+      tip.textContent=el.dataset.tip; tip.style.display='block';
+    });
+    el.addEventListener('mousemove',e=>{
+      tip.style.left=(e.clientX+12)+'px'; tip.style.top=(e.clientY-28)+'px';
+    });
+    el.addEventListener('mouseleave',()=>{ tip.style.display='none'; });
+  });
+
+  // ── Monthly bars ──
+  const months=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date(today.getFullYear(),today.getMonth()-i,1);
+    const key=`${d.getFullYear()}-${d.getMonth()}`;
+    const count=vocab.filter(v=>{const a=new Date(v.added);return a.getFullYear()===d.getFullYear()&&a.getMonth()===d.getMonth();}).length;
+    months.push({label:d.toLocaleString('default',{month:'short'}),year:d.getFullYear(),count});
+  }
+  const maxCount=Math.max(...months.map(m=>m.count),1);
+  g('monthly-bars').innerHTML=months.map(m=>`
+    <div class="mbar-item">
+      <div class="mbar-count">${m.count||''}</div>
+      <div class="mbar-track"><div class="mbar-fill" style="height:${Math.round((m.count/maxCount)*100)}%"></div></div>
+      <div class="mbar-label">${m.label}</div>
+    </div>`).join('');
+}
+
+
 (async()=>{
   const user = await SB.restoreSession();
   if (user) {
