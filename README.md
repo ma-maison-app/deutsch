@@ -1390,13 +1390,13 @@ main {
             </div>
           </div>
 
-          <div class="form-dict-links" id="v-dict-links" style="display:none">
+          <div class="form-dict-links" id="v-dict-links">
             <div class="form-dict-label">🔍 Look up word:</div>
-            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-leo">LEO</a>
-            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-wikt">Wiktionary</a>
-            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-collins">Collins</a>
-            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-deepl">DeepL</a>
-            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-reverso">Reverso</a>
+            <a href="https://dict.leo.org/englisch-deutsch/" target="_blank" rel="noopener" class="form-dict-link" id="v-link-leo">LEO</a>
+            <a href="https://en.wiktionary.org/wiki/" target="_blank" rel="noopener" class="form-dict-link" id="v-link-wikt">Wiktionary</a>
+            <a href="https://www.collinsdictionary.com/dictionary/german-english/" target="_blank" rel="noopener" class="form-dict-link" id="v-link-collins">Collins</a>
+            <a href="https://www.deepl.com/translator#de/en/" target="_blank" rel="noopener" class="form-dict-link" id="v-link-deepl">DeepL</a>
+            <a href="https://context.reverso.net/translation/german-english/" target="_blank" rel="noopener" class="form-dict-link" id="v-link-reverso">Reverso</a>
           </div>
 
           <div class="image-upload-section">
@@ -1664,13 +1664,13 @@ main {
       </div>
     </div>
 
-    <div class="form-dict-links" id="edit-dict-links" style="display:none">
+    <div class="form-dict-links" id="edit-dict-links">
       <div class="form-dict-label">🔍 Look up word:</div>
-      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-leo">LEO</a>
-      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-wikt">Wiktionary</a>
-      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-collins">Collins</a>
-      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-deepl">DeepL</a>
-      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-reverso">Reverso</a>
+      <a href="https://dict.leo.org/englisch-deutsch/" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-leo">LEO</a>
+      <a href="https://en.wiktionary.org/wiki/" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-wikt">Wiktionary</a>
+      <a href="https://www.collinsdictionary.com/dictionary/german-english/" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-collins">Collins</a>
+      <a href="https://www.deepl.com/translator#de/en/" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-deepl">DeepL</a>
+      <a href="https://context.reverso.net/translation/german-english/" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-reverso">Reverso</a>
     </div>
 
     <div class="image-upload-section">
@@ -2041,15 +2041,7 @@ function addVocab() {
 
 function updateDictLinks(prefix) {
   const word = g(`${prefix}-word`).value.trim();
-  const linksContainer = g(`${prefix}-dict-links`);
-  
-  if (!word) {
-    linksContainer.style.display = 'none';
-    return;
-  }
-  
-  linksContainer.style.display = 'flex';
-  const encoded = encodeURIComponent(word);
+  const encoded = encodeURIComponent(word || '');
   
   g(`${prefix}-link-leo`).href = `https://dict.leo.org/englisch-deutsch/${encoded}`;
   g(`${prefix}-link-wikt`).href = `https://en.wiktionary.org/wiki/${encoded}`;
@@ -2066,7 +2058,7 @@ function clearVocabForm() {
   });
   document.querySelectorAll('#v-tags-chips .chip').forEach(c => c.classList.remove('on'));
   removeImage('v-image-preview', 'vocab');
-  g('v-dict-links').style.display = 'none';
+  
 }
 
 function deleteWord(id) {
