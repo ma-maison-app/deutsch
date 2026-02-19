@@ -1391,9 +1391,10 @@ main {
           </div>
 
           <div class="form-dict-links" id="v-dict-links" style="display:none">
-            <div class="form-dict-label">🔍 Quick Lookup:</div>
+            <div class="form-dict-label">🔍 Look up word:</div>
             <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-leo">LEO</a>
             <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-wikt">Wiktionary</a>
+            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-collins">Collins</a>
             <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-deepl">DeepL</a>
             <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-reverso">Reverso</a>
           </div>
@@ -1664,9 +1665,10 @@ main {
     </div>
 
     <div class="form-dict-links" id="edit-dict-links" style="display:none">
-      <div class="form-dict-label">🔍 Quick Lookup:</div>
+      <div class="form-dict-label">🔍 Look up word:</div>
       <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-leo">LEO</a>
       <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-wikt">Wiktionary</a>
+      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-collins">Collins</a>
       <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-deepl">DeepL</a>
       <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-reverso">Reverso</a>
     </div>
@@ -2051,6 +2053,7 @@ function updateDictLinks(prefix) {
   
   g(`${prefix}-link-leo`).href = `https://dict.leo.org/englisch-deutsch/${encoded}`;
   g(`${prefix}-link-wikt`).href = `https://en.wiktionary.org/wiki/${encoded}`;
+  g(`${prefix}-link-collins`).href = `https://www.collinsdictionary.com/dictionary/german-english/${encoded}`;
   g(`${prefix}-link-deepl`).href = `https://www.deepl.com/translator#de/en/${encoded}`;
   g(`${prefix}-link-reverso`).href = `https://context.reverso.net/translation/german-english/${encoded}`;
 }
@@ -2202,6 +2205,7 @@ function renderVocab() {
       <div class="dict-links">
         <a href="https://dict.leo.org/englisch-deutsch/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="LEO Dictionary">LEO</a>
         <a href="https://en.wiktionary.org/wiki/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="Wiktionary">Wikt</a>
+        <a href="https://www.collinsdictionary.com/dictionary/german-english/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="Collins Dictionary (IPA)">Collins</a>
         <a href="https://www.deepl.com/translator#de/en/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="DeepL Translator">DeepL</a>
         <a href="https://context.reverso.net/translation/german-english/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="Reverso Context">Rev</a>
       </div>
