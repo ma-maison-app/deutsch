@@ -813,8 +813,41 @@ main {
   font-style: italic;
 }
 
+/* ── DICTIONARY LINKS ── */
+.dict-links {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(184,145,63,0.12);
+  flex-wrap: wrap;
+}
+
+.dict-link {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: rgba(184,145,63,0.04);
+  transition: all 0.2s;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 500;
+}
+
+.dict-link:hover {
+  background: var(--gold);
+  color: white;
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(184,145,63,0.2);
+}
+
 .card-actions { 
-  margin-top: 1.25rem; 
+  margin-top: 1rem; 
   display: flex; 
   gap: 0.5rem; 
   padding-top: 1rem;
@@ -2080,6 +2113,12 @@ function renderVocab() {
         ${v.cases ? `<span class="vc-el">Cases / Conj.</span>${esc(v.cases)}` : ''}
         ${v.context ? `<span class="vc-el">Context</span><div class="vc-ctx">${esc(v.context)}</div>` : ''}
       </div>` : ''}
+      <div class="dict-links">
+        <a href="https://dict.leo.org/englisch-deutsch/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="LEO Dictionary">LEO</a>
+        <a href="https://en.wiktionary.org/wiki/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="Wiktionary">Wikt</a>
+        <a href="https://www.deepl.com/translator#de/en/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="DeepL Translator">DeepL</a>
+        <a href="https://context.reverso.net/translation/german-english/${encodeURIComponent(v.word)}" target="_blank" rel="noopener" class="dict-link" title="Reverso Context">Rev</a>
+      </div>
       <div class="card-actions">
         <button class="btn sec sm" onclick="openEdit(${v.id})">Edit</button>
         <button class="btn sm danger" onclick="deleteWord(${v.id})">Delete</button>
