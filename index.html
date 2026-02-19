@@ -4,6 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Deutsch — My Study Space</title>
+<!--
+  ═══════════════════════════════════════════════════════════════
+  DEUTSCH STUDY APP - FIXED VERSION
+  ═══════════════════════════════════════════════════════════════
+  
+  WHAT WAS FIXED:
+  ✓ Added proper error handling for network failures
+  ✓ Better error messages when Supabase connection fails
+  ✓ Graceful degradation when offline
+  
+  REQUIREMENTS TO USE THIS APP:
+  1. Internet connection (required for Supabase backend)
+  2. Modern web browser (Chrome, Firefox, Safari, Edge)
+  3. Must be served from a web server (not just opened as file://)
+  
+  TO RUN LOCALLY:
+  - Use a local server like: python -m http.server 8000
+  - Or use VS Code Live Server extension
+  - Then open http://localhost:8000
+  
+  THE "FAILED TO FETCH" ERROR MEANS:
+  - No internet connection, OR
+  - File opened directly (file://) instead of through a server, OR  
+  - Network firewall blocking Supabase
+  
+  ═══════════════════════════════════════════════════════════════
+-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Work+Sans:wght@300;400;500;600&family=Allura&display=swap" rel="stylesheet">
 <style>
@@ -1618,8 +1645,13 @@ const SB = {
     );
   },
   async restoreSession() {
-    const { data } = await this.client.auth.getSession();
-    return data?.session?.user || null;
+    try {
+      const { data } = await this.client.auth.getSession();
+      return data?.session?.user || null;
+    } catch (error) {
+      console.error('Session restore failed:', error);
+      return null;
+    }
   },
   async signUp(email, password) {
     const { data, error } = await this.client.auth.signUp({ email, password });
@@ -1635,11 +1667,24 @@ const SB = {
     await this.client.auth.signOut();
   },
   async loadData() {
-    const { data } = await this.client.from('deutsch_data').select('*').single();
-    return data || {};
+    try {
+      const { data, error } = await this.client.from('deutsch_data').select('*').single();
+      if (error) throw error;
+      return data || {};
+    } catch (error) {
+      console.error('Load data failed:', error);
+      toast('Failed to load data from server', 'err');
+      return {};
+    }
   },
   async saveData(payload) {
-    await this.client.from('deutsch_data').upsert(payload);
+    try {
+      const { error } = await this.client.from('deutsch_data').upsert(payload);
+      if (error) throw error;
+    } catch (error) {
+      console.error('Save data failed:', error);
+      toast('Failed to save data to server', 'err');
+    }
   }
 };
 SB.init();
@@ -1677,7 +1722,10 @@ async function signUp(e) {
     g('su-err').textContent = 'Check your email to confirm!';
     setTimeout(() => switchAuthTab('signin'), 2000);
   } catch (err) {
-    g('su-err').textContent = err.message;
+    const errorMsg = err.message.includes('fetch') 
+      ? 'Network error - please check your internet connection'
+      : err.message;
+    g('su-err').textContent = errorMsg;
   }
 }
 
@@ -1688,7 +1736,10 @@ async function signIn(e) {
     const user = await SB.signIn(email, pass);
     await bootApp();
   } catch (err) {
-    g('si-err').textContent = err.message;
+    const errorMsg = err.message.includes('fetch') 
+      ? 'Network error - please check your internet connection'
+      : err.message;
+    g('si-err').textContent = errorMsg;
   }
 }
 
@@ -2409,9 +2460,25 @@ function resetQuiz() {
 // INIT
 // ══════════════════════════════════════════════════════════
 (async () => {
-  const user = await SB.restoreSession();
-  if (user) {
-    await bootApp();
+  try {
+    const user = await SB.restoreSession();
+    if (user) {
+      await bootApp();
+    }
+  } catch (error) {
+    console.error('Initialization error:', error);
+    // Show auth screen even on error so user can try to login
+    g('auth-screen').style.display = 'flex';
+    g('app-screen').style.display = 'none';
+    
+    // If it's a network error, show helpful message
+    if (error.message && error.message.includes('fetch')) {
+      const authNote = document.querySelector('.auth-note');
+      if (authNote) {
+        authNote.textContent = '⚠️ Network connection issue. Please check your internet connection and try again.';
+        authNote.style.color = 'var(--error)';
+      }
+    }
   }
 })();
 </script>
