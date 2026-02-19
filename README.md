@@ -1062,9 +1062,12 @@ main {
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-deep);
-  transition: transform 0.6s;
+  transition: transform 0.6s, opacity 0.3s;
   transform-style: preserve-3d;
   position: relative;
+  cursor: pointer;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
 }
 
 .quiz-card.flipped {
@@ -2463,7 +2466,7 @@ function showQuestion() {
           ${word.image ? `<img src="${word.image}" class="quiz-image" alt="image">` : ''}
           ${word.gender ? `<div class="quiz-article">${esc(word.gender)}</div>` : ''}
           <div class="quiz-word">${esc(word.word)}</div>
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:1.5rem">Click to flip</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:1.5rem">Click to flip • Swipe for next</div>
         </div>
         <div class="quiz-card-back">
           <div class="quiz-translation">${esc(word.translation)}</div>
@@ -2471,9 +2474,56 @@ function showQuestion() {
         </div>
       </div>
       <div class="btn-row" style="justify-content:center;margin-top:2rem">
-        <button class="btn sec" onclick="quizIndex++;showQuestion()">Next →</button>
+        <button class="btn sec" onclick="prevCard()">← Prev</button>
+        <button class="btn" onclick="nextCard()">Next →</button>
       </div>
     `;
+    
+    // Add swipe functionality
+    const card = g('flashcard');
+    let startX = 0, startY = 0, isDragging = false;
+    
+    card.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isDragging = true;
+    });
+    
+    card.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const deltaX = e.touches[0].clientX - startX;
+      const deltaY = Math.abs(e.touches[0].clientY - startY);
+      
+      // Only swipe if horizontal movement is larger than vertical
+      if (Math.abs(deltaX) > deltaY) {
+        e.preventDefault();
+        card.style.transform = `translateX(${deltaX}px) rotate(${deltaX * 0.05}deg)`;
+        card.style.opacity = 1 - Math.abs(deltaX) / 300;
+      }
+    });
+    
+    card.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      const deltaX = e.changedTouches[0].clientX - startX;
+      
+      // Swipe threshold
+      if (Math.abs(deltaX) > 100) {
+        if (deltaX > 0) {
+          // Swipe right - go to previous
+          prevCard();
+        } else {
+          // Swipe left - go to next
+          nextCard();
+        }
+      } else {
+        // Reset position
+        card.style.transform = '';
+        card.style.opacity = '';
+      }
+    });
+    
   } else if (quizMode === 'multiple') {
     const options = [word.translation];
     const otherWords = vocab.filter(v => v.id !== word.id && v.translation !== word.translation);
@@ -2630,6 +2680,20 @@ function showResults() {
       <button class="btn" onclick="startQuiz()">Try Again</button>
     </div>
   `;
+}
+
+function nextCard() {
+  if (quizIndex < quizData.length - 1) {
+    quizIndex++;
+    showQuestion();
+  }
+}
+
+function prevCard() {
+  if (quizIndex > 0) {
+    quizIndex--;
+    showQuestion();
+  }
 }
 
 function resetQuiz() {
