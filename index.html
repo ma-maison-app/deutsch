@@ -846,6 +846,51 @@ main {
   box-shadow: 0 2px 8px rgba(184,145,63,0.2);
 }
 
+/* Form dictionary links (in add/edit) */
+.form-dict-links {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(135deg, rgba(184,145,63,0.08), rgba(74,111,165,0.08));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 1.2rem 0;
+  flex-wrap: wrap;
+}
+
+.form-dict-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 500;
+  font-family: 'Work Sans', sans-serif;
+}
+
+.form-dict-link {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  transition: all 0.2s;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 600;
+}
+
+.form-dict-link:hover {
+  background: var(--gold);
+  color: white;
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(184,145,63,0.25);
+}
+
+
 .card-actions { 
   margin-top: 1rem; 
   display: flex; 
@@ -1334,12 +1379,20 @@ main {
             </div>
             <div class="wh-cell">
               <div class="wh-label">German Word</div>
-              <input type="text" id="v-word" placeholder="Wort">
+              <input type="text" id="v-word" placeholder="Wort" oninput="updateDictLinks('v')">
             </div>
             <div class="wh-cell">
               <div class="wh-label">Translation</div>
               <input type="text" id="v-translation" placeholder="meaning">
             </div>
+          </div>
+
+          <div class="form-dict-links" id="v-dict-links" style="display:none">
+            <div class="form-dict-label">🔍 Quick Lookup:</div>
+            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-leo">LEO</a>
+            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-wikt">Wiktionary</a>
+            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-deepl">DeepL</a>
+            <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="v-link-reverso">Reverso</a>
           </div>
 
           <div class="image-upload-section">
@@ -1599,12 +1652,20 @@ main {
       </div>
       <div class="wh-cell">
         <div class="wh-label">German Word</div>
-        <input type="text" id="edit-word">
+        <input type="text" id="edit-word" oninput="updateDictLinks('edit')">
       </div>
       <div class="wh-cell">
         <div class="wh-label">Translation</div>
         <input type="text" id="edit-translation">
       </div>
+    </div>
+
+    <div class="form-dict-links" id="edit-dict-links" style="display:none">
+      <div class="form-dict-label">🔍 Quick Lookup:</div>
+      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-leo">LEO</a>
+      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-wikt">Wiktionary</a>
+      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-deepl">DeepL</a>
+      <a href="#" target="_blank" rel="noopener" class="form-dict-link" id="edit-link-reverso">Reverso</a>
     </div>
 
     <div class="image-upload-section">
@@ -1973,6 +2034,24 @@ function addVocab() {
   toast('Word added!');
 }
 
+function updateDictLinks(prefix) {
+  const word = g(`${prefix}-word`).value.trim();
+  const linksContainer = g(`${prefix}-dict-links`);
+  
+  if (!word) {
+    linksContainer.style.display = 'none';
+    return;
+  }
+  
+  linksContainer.style.display = 'flex';
+  const encoded = encodeURIComponent(word);
+  
+  g(`${prefix}-link-leo`).href = `https://dict.leo.org/englisch-deutsch/${encoded}`;
+  g(`${prefix}-link-wikt`).href = `https://en.wiktionary.org/wiki/${encoded}`;
+  g(`${prefix}-link-deepl`).href = `https://www.deepl.com/translator#de/en/${encoded}`;
+  g(`${prefix}-link-reverso`).href = `https://context.reverso.net/translation/german-english/${encoded}`;
+}
+
 function clearVocabForm() {
   ['v-gender', 'v-word', 'v-translation', 'v-topic', 'v-week', 'v-quarter', 'v-year', 'v-cases', 'v-context'].forEach(id => {
     const el = g(id);
@@ -1981,6 +2060,7 @@ function clearVocabForm() {
   });
   document.querySelectorAll('#v-tags-chips .chip').forEach(c => c.classList.remove('on'));
   removeImage('v-image-preview', 'vocab');
+  g('v-dict-links').style.display = 'none';
 }
 
 function deleteWord(id) {
@@ -2016,6 +2096,9 @@ function openEdit(id) {
   } else {
     removeImage('edit-image-preview', 'edit');
   }
+  
+  // Update dictionary links for the word being edited
+  updateDictLinks('edit');
   
   g('edit-modal').style.display = 'block';
 }
